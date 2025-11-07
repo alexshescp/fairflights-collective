@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Check, ShieldCheck, LucideShield, Users, DollarSign } from 'lucide-react';
+import { Check, ShieldCheck, Users, DollarSign } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 const WhyJoin = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -26,25 +27,12 @@ const WhyJoin = () => {
     };
   }, []);
 
+  const { translations } = useI18n();
+  const whyJoin = translations.whyJoin;
   const benefits = [
-    {
-      icon: DollarSign,
-      title: "Secure Compensation",
-      description: "Get financial compensation for the inconvenience and losses you suffered.",
-      delay: "delay-100"
-    },
-    {
-      icon: ShieldCheck,
-      title: "Push for Policy Changes",
-      description: "Help create systematic changes in the airline industry to prevent future unfair practices.",
-      delay: "delay-200"
-    },
-    {
-      icon: Users,
-      title: "Strength in Numbers",
-      description: "Join forces with other affected passengers to amplify your voice and legal standing.",
-      delay: "delay-300"
-    }
+    { icon: DollarSign, ...whyJoin.benefits[0], delay: 'delay-100' },
+    { icon: ShieldCheck, ...whyJoin.benefits[1], delay: 'delay-200' },
+    { icon: Users, ...whyJoin.benefits[2], delay: 'delay-300' }
   ];
 
   return (
@@ -64,18 +52,17 @@ const WhyJoin = () => {
           <div className={`inline-block bg-suit-100 text-suit-800 px-4 py-1 rounded-full text-sm font-medium mb-4 transition-all duration-500 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            Benefits
+            {whyJoin.badge}
           </div>
           <h2 className={`heading-2 mb-4 transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            Why Join the Class-Action Lawsuit?
+            {whyJoin.title}
           </h2>
           <p className={`subtitle transition-all duration-700 delay-200 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            Swiss Airlines operates in an oligopolistic market, often engaging in unfair practices that harm passengers. 
-            By joining forces, we can make a real difference.
+            {whyJoin.description}
           </p>
         </div>
 
@@ -104,13 +91,10 @@ const WhyJoin = () => {
               isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
             }`}>
               <div className="inline-block bg-suit-100 text-suit-800 px-4 py-1 rounded-full text-sm font-medium mb-4">
-                Estimated Compensation
+                {whyJoin.compensation.badge}
               </div>
-              <h3 className="heading-3 mb-6">What You Could Receive</h3>
-              <p className="text-justice-600 mb-8">
-                The potential compensation per participant varies based on your specific situation and the extent of 
-                damages you experienced. Here's what you might expect:
-              </p>
+              <h3 className="heading-3 mb-6">{whyJoin.compensation.title}</h3>
+              <p className="text-justice-600 mb-8">{whyJoin.compensation.description}</p>
 
               <div className="space-y-6">
                 <div className="flex items-start">
@@ -118,10 +102,8 @@ const WhyJoin = () => {
                     <Check size={16} className="text-suit-700" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-lg">€500</h4>
-                    <p className="text-sm text-justice-600">
-                      Base compensation if you were a passenger with Swiss Airlines within the past two years and experienced any of the mentioned issues.
-                    </p>
+                    <h4 className="font-semibold text-lg">{whyJoin.compensation.items[0].amount}</h4>
+                    <p className="text-sm text-justice-600">{whyJoin.compensation.items[0].description}</p>
                   </div>
                 </div>
 
@@ -130,10 +112,8 @@ const WhyJoin = () => {
                     <Check size={16} className="text-suit-700" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-lg">Up to €10,000</h4>
-                    <p className="text-sm text-justice-600">
-                      Higher compensation is possible if you've already had a direct dispute with the airline, with documented evidence of the unfair practices.
-                    </p>
+                    <h4 className="font-semibold text-lg">{whyJoin.compensation.items[1].amount}</h4>
+                    <p className="text-sm text-justice-600">{whyJoin.compensation.items[1].description}</p>
                   </div>
                 </div>
               </div>
@@ -142,48 +122,18 @@ const WhyJoin = () => {
             <div className={`bg-justice-50 rounded-xl p-8 transition-all duration-700 delay-500 ${
               isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
             }`}>
-              <h3 className="text-xl font-semibold mb-4">Key Facts About Your Claim</h3>
-              
+              <h3 className="text-xl font-semibold mb-4">{whyJoin.compensation.factsTitle}</h3>
+
               <div className="space-y-4">
-                <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-                  <div className="text-3xl font-bold text-suit-600 mr-4">1</div>
-                  <div>
-                    <h4 className="font-medium">Two-Year Window</h4>
-                    <p className="text-sm text-justice-600">
-                      If you flew with Swiss Airlines in the past two years, you may be eligible.
-                    </p>
+                {whyJoin.compensation.facts.map((fact, index) => (
+                  <div key={fact.title} className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+                    <div className="text-3xl font-bold text-suit-600 mr-4">{index + 1}</div>
+                    <div>
+                      <h4 className="font-medium">{fact.title}</h4>
+                      <p className="text-sm text-justice-600">{fact.description}</p>
+                    </div>
                   </div>
-                </div>
-
-                <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-                  <div className="text-3xl font-bold text-suit-600 mr-4">2</div>
-                  <div>
-                    <h4 className="font-medium">No Upfront Costs</h4>
-                    <p className="text-sm text-justice-600">
-                      Joining the lawsuit is free - legal fees are only paid if compensation is secured.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-                  <div className="text-3xl font-bold text-suit-600 mr-4">3</div>
-                  <div>
-                    <h4 className="font-medium">Evidence Helps</h4>
-                    <p className="text-sm text-justice-600">
-                      While not required, any evidence of unfair treatment strengthens your claim.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-                  <div className="text-3xl font-bold text-suit-600 mr-4">4</div>
-                  <div>
-                    <h4 className="font-medium">Group Power</h4>
-                    <p className="text-sm text-justice-600">
-                      A class-action approach increases the chances of a favorable outcome for all.
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>

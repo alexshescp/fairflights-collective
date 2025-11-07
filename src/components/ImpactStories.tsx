@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Quote, Users, Sparkles } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 /**
  * ImpactStories shares anonymised passenger testimonials that emphasise the
@@ -9,33 +10,9 @@ import { Quote, Users, Sparkles } from 'lucide-react';
  */
 const ImpactStories = () => {
   // Memoise the stories array to avoid re-creating it on every render.
-  const stories = useMemo(
-    () => [
-      {
-        passenger: 'Parent of two from Geneva',
-        summary:
-          '"Our family tickets doubled in price overnight during the school holidays. Joining the collective is the first time we felt heard."',
-        outcome:
-          'After submitting evidence of price discrimination, this family was invited to contribute to the legal brief on unfair targeting.'
-      },
-      {
-        passenger: 'Small business owner from Lisbon',
-        summary:
-          '"Swiss Airlines cancelled my connecting flight and kept the surcharge. I lost a client meeting and hundreds of euros."',
-        outcome:
-          'The legal team helped structure the financial loss statement that now strengthens the damages claim for international passengers.'
-      },
-      {
-        passenger: 'Student traveller from Berlin',
-        summary:
-          '"Customer support told me there were no alternatives, but seats were still available online at triple the cost."',
-        outcome:
-          'Their screenshots now form part of the evidence package demonstrating systematic misinformation across channels.'
-      }
-    ],
-    []
-  );
-
+  const { translations } = useI18n();
+  const impactStories = translations.impactStories;
+  const stories = useMemo(() => impactStories.stories, [impactStories.stories]);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const activeStory = stories[activeStoryIndex];
 
@@ -46,13 +23,10 @@ const ImpactStories = () => {
           <div className="lg:w-2/5 space-y-6">
             <div className="inline-flex items-center bg-suit-100 text-suit-800 px-4 py-1 rounded-full text-sm font-medium">
               <Users size={16} className="mr-2" />
-              Community Voices
+              {impactStories.badge}
             </div>
-            <h2 className="heading-2">Real Travellers, Real Impact</h2>
-            <p className="subtitle">
-              Every experience strengthens the collective case. Explore how participants across Europe are helping expose the
-              airline&apos;s unfair practices and broaden the scope of the claim.
-            </p>
+            <h2 className="heading-2">{impactStories.title}</h2>
+            <p className="subtitle">{impactStories.description}</p>
             <div className="grid grid-cols-1 gap-4">
               {stories.map((story, index) => (
                 <button
@@ -81,7 +55,7 @@ const ImpactStories = () => {
               <div className="mt-6 p-5 bg-justice-50 rounded-xl border border-justice-100 flex items-start">
                 <Sparkles size={24} className="text-suit-500 mr-3 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-suit-700">How this story helps the case</h3>
+                  <h3 className="font-semibold text-suit-700">{impactStories.highlightTitle}</h3>
                   <p className="text-justice-600 mt-2">{activeStory.outcome}</p>
                 </div>
               </div>

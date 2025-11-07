@@ -1,7 +1,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { AlertCircle, Check } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from '@/hooks/use-toast';
+import { useI18n } from '@/lib/i18n';
 
 interface FormState {
   firstName: string;
@@ -27,6 +28,13 @@ const ParticipationForm = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { translations } = useI18n();
+  const formText = translations.participationForm;
+  const personalFields = formText.sections.personalInformation.fields;
+  const travelFields = formText.sections.travelInformation.fields;
+  const incidentText = formText.sections.incidentDetails;
+  const contactText = formText.sections.contactPreferences;
+  const termsText = formText.sections.terms;
   
   const [formState, setFormState] = useState<FormState>({
     firstName: '',
@@ -90,25 +98,25 @@ const ParticipationForm = () => {
   const validateForm = () => {
     const newErrors: Partial<FormState> = {};
     
-    if (!formState.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formState.lastName.trim()) newErrors.lastName = 'Last name is required';
-    
+    if (!formState.firstName.trim()) newErrors.firstName = personalFields.firstName.error;
+    if (!formState.lastName.trim()) newErrors.lastName = personalFields.lastName.error;
+
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formState.email.trim()) newErrors.email = 'Email is required';
-    else if (!emailPattern.test(formState.email)) newErrors.email = 'Please enter a valid email';
-    
-    if (!formState.travelDate) newErrors.travelDate = 'Travel date is required';
-    if (!formState.bookingReference.trim()) newErrors.bookingReference = 'Booking reference is required';
-    if (!formState.flightNumber.trim()) newErrors.flightNumber = 'Flight number is required';
-    if (!formState.ticketClass) newErrors.ticketClass = 'Select the ticket class you travelled with';
-    
+    if (!formState.email.trim()) newErrors.email = personalFields.email.errorRequired;
+    else if (!emailPattern.test(formState.email)) newErrors.email = personalFields.email.errorInvalid;
+
+    if (!formState.travelDate) newErrors.travelDate = travelFields.travelDate.error;
+    if (!formState.bookingReference.trim()) newErrors.bookingReference = travelFields.bookingReference.error;
+    if (!formState.flightNumber.trim()) newErrors.flightNumber = travelFields.flightNumber.error;
+    if (!formState.ticketClass) newErrors.ticketClass = travelFields.ticketClass.error;
+
     if (formState.isDirectlyAffected) {
-      if (!formState.incidentType) newErrors.incidentType = 'Please select an incident type';
-      if (!formState.incidentDescription.trim()) 
-        newErrors.incidentDescription = 'Please describe the incident';
+      if (!formState.incidentType) newErrors.incidentType = incidentText.incidentType.error;
+      if (!formState.incidentDescription.trim())
+        newErrors.incidentDescription = incidentText.descriptionField.error;
     }
-    
-    if (!formState.agreeToTerms) newErrors.agreeToTerms = 'You must agree to the terms';
+
+    if (!formState.agreeToTerms) newErrors.agreeToTerms = termsText.error;
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -127,8 +135,8 @@ const ParticipationForm = () => {
       setIsSubmitted(true);
       
       toast({
-        title: "Registration Successful",
-        description: "You have successfully joined the class-action lawsuit. Check your email for verification.",
+        title: formText.toast.title,
+        description: formText.toast.description,
         variant: "default",
       });
     }, 1500);
@@ -142,41 +150,22 @@ const ParticipationForm = () => {
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Check size={32} className="text-green-600" />
             </div>
-            <h2 className="heading-2 mb-4">Thank You for Joining!</h2>
-            <p className="subtitle mb-8">
-              Your participation has been registered successfully. We've sent a verification email to your inbox.
-              Please check and confirm your email to complete the registration process.
-            </p>
+            <h2 className="heading-2 mb-4">{formText.success.title}</h2>
+            <p className="subtitle mb-8">{formText.success.description}</p>
             <div className="bg-justice-50 p-6 rounded-xl text-left mb-8">
-              <h3 className="text-lg font-semibold mb-2">What Happens Next?</h3>
+              <h3 className="text-lg font-semibold mb-2">{formText.success.nextStepsTitle}</h3>
               <ul className="space-y-2 text-justice-700">
-                <li className="flex items-start">
-                  <span className="inline-block w-5 h-5 bg-suit-100 rounded-full flex-shrink-0 flex items-center justify-center mr-3 mt-1">
-                    <span className="block w-1.5 h-1.5 bg-suit-600 rounded-full"></span>
-                  </span>
-                  <span>Verify your email address using the link we sent you</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="inline-block w-5 h-5 bg-suit-100 rounded-full flex-shrink-0 flex items-center justify-center mr-3 mt-1">
-                    <span className="block w-1.5 h-1.5 bg-suit-600 rounded-full"></span>
-                  </span>
-                  <span>Our team will review your submission</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="inline-block w-5 h-5 bg-suit-100 rounded-full flex-shrink-0 flex items-center justify-center mr-3 mt-1">
-                    <span className="block w-1.5 h-1.5 bg-suit-600 rounded-full"></span>
-                  </span>
-                  <span>You'll receive updates on the lawsuit's progress</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="inline-block w-5 h-5 bg-suit-100 rounded-full flex-shrink-0 flex items-center justify-center mr-3 mt-1">
-                    <span className="block w-1.5 h-1.5 bg-suit-600 rounded-full"></span>
-                  </span>
-                  <span>We may contact you for additional information if needed</span>
-                </li>
+                {formText.success.nextSteps.map(step => (
+                  <li key={step} className="flex items-start">
+                    <span className="inline-block w-5 h-5 bg-suit-100 rounded-full flex-shrink-0 flex items-center justify-center mr-3 mt-1">
+                      <span className="block w-1.5 h-1.5 bg-suit-600 rounded-full"></span>
+                    </span>
+                    <span>{step}</span>
+                  </li>
+                ))}
               </ul>
             </div>
-            <a href="#" className="btn btn-primary">Return to Home</a>
+            <a href="#" className="btn btn-primary">{formText.success.cta}</a>
           </div>
         </div>
       </section>
@@ -194,17 +183,17 @@ const ParticipationForm = () => {
           <div className={`inline-block bg-suit-100 text-suit-800 px-4 py-1 rounded-full text-sm font-medium mb-4 transition-all duration-500 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            Join Us
+            {formText.badge}
           </div>
           <h2 className={`heading-2 mb-4 transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            Participation Form
+            {formText.title}
           </h2>
           <p className={`subtitle transition-all duration-700 delay-200 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            Complete the form below to join the class-action lawsuit against Swiss Airlines and seek compensation for unfair practices.
+            {formText.description}
           </p>
         </div>
 
@@ -214,70 +203,70 @@ const ParticipationForm = () => {
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <h3 className="text-xl font-semibold mb-6">Personal Information</h3>
+          <h3 className="text-xl font-semibold mb-6">{formText.sections.personalInformation.title}</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="form-input-wrapper">
-              <label htmlFor="firstName" className="form-label">First Name*</label>
-              <input 
-                type="text" 
+              <label htmlFor="firstName" className="form-label">{personalFields.firstName.label}</label>
+              <input
+                type="text"
                 id="firstName"
                 name="firstName"
                 value={formState.firstName}
                 onChange={handleChange}
                 className={`form-input ${errors.firstName ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : ''}`}
-                placeholder="Enter your first name"
+                placeholder={personalFields.firstName.placeholder}
               />
               {errors.firstName && <p className="form-error">{errors.firstName}</p>}
             </div>
 
             <div className="form-input-wrapper">
-              <label htmlFor="lastName" className="form-label">Last Name*</label>
-              <input 
-                type="text" 
+              <label htmlFor="lastName" className="form-label">{personalFields.lastName.label}</label>
+              <input
+                type="text"
                 id="lastName"
                 name="lastName"
                 value={formState.lastName}
                 onChange={handleChange}
                 className={`form-input ${errors.lastName ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : ''}`}
-                placeholder="Enter your last name"
+                placeholder={personalFields.lastName.placeholder}
               />
               {errors.lastName && <p className="form-error">{errors.lastName}</p>}
             </div>
 
             <div className="form-input-wrapper">
-              <label htmlFor="email" className="form-label">Email Address*</label>
-              <input 
-                type="email" 
+              <label htmlFor="email" className="form-label">{personalFields.email.label}</label>
+              <input
+                type="email"
                 id="email"
                 name="email"
                 value={formState.email}
                 onChange={handleChange}
                 className={`form-input ${errors.email ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : ''}`}
-                placeholder="your.email@example.com"
+                placeholder={personalFields.email.placeholder}
               />
               {errors.email && <p className="form-error">{errors.email}</p>}
             </div>
 
             <div className="form-input-wrapper">
-              <label htmlFor="phone" className="form-label">Phone Number (Optional)</label>
-              <input 
-                type="tel" 
+              <label htmlFor="phone" className="form-label">{personalFields.phone.label}</label>
+              <input
+                type="tel"
                 id="phone"
                 name="phone"
                 value={formState.phone}
                 onChange={handleChange}
                 className="form-input"
-                placeholder="+1 (123) 456-7890"
+                placeholder={personalFields.phone.placeholder}
               />
             </div>
           </div>
 
-          <h3 className="text-xl font-semibold mb-6">Travel Information</h3>
+          <h3 className="text-xl font-semibold mb-6">{formText.sections.travelInformation.title}</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="form-input-wrapper">
-              <label htmlFor="travelDate" className="form-label">Travel Date*</label>
+              <label htmlFor="travelDate" className="form-label">{travelFields.travelDate.label}</label>
               <input
                 type="date"
                 id="travelDate"
@@ -290,15 +279,15 @@ const ParticipationForm = () => {
             </div>
 
             <div className="form-input-wrapper">
-              <label htmlFor="bookingReference" className="form-label">Booking Reference*</label>
-              <input 
-                type="text" 
+              <label htmlFor="bookingReference" className="form-label">{travelFields.bookingReference.label}</label>
+              <input
+                type="text"
                 id="bookingReference"
                 name="bookingReference"
                 value={formState.bookingReference}
                 onChange={handleChange}
                 className={`form-input ${errors.bookingReference ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : ''}`}
-                placeholder="e.g. ABC123"
+                placeholder={travelFields.bookingReference.placeholder}
               />
               {errors.bookingReference && <p className="form-error">{errors.bookingReference}</p>}
             </div>
@@ -306,7 +295,7 @@ const ParticipationForm = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="form-input-wrapper">
-              <label htmlFor="flightNumber" className="form-label">Flight Number*</label>
+              <label htmlFor="flightNumber" className="form-label">{travelFields.flightNumber.label}</label>
               <input
                 type="text"
                 id="flightNumber"
@@ -314,12 +303,12 @@ const ParticipationForm = () => {
                 value={formState.flightNumber}
                 onChange={handleChange}
                 className={`form-input ${errors.flightNumber ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : ''}`}
-                placeholder="e.g. LX280"
+                placeholder={travelFields.flightNumber.placeholder}
               />
               {errors.flightNumber && <p className="form-error">{errors.flightNumber}</p>}
             </div>
             <div className="form-input-wrapper">
-              <label htmlFor="ticketClass" className="form-label">Ticket Class*</label>
+              <label htmlFor="ticketClass" className="form-label">{travelFields.ticketClass.label}</label>
               <select
                 id="ticketClass"
                 name="ticketClass"
@@ -327,11 +316,11 @@ const ParticipationForm = () => {
                 onChange={handleChange}
                 className={`form-input ${errors.ticketClass ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : ''}`}
               >
-                <option value="">Select an option</option>
-                <option value="economy">Economy</option>
-                <option value="premium">Premium Economy</option>
-                <option value="business">Business</option>
-                <option value="first">First</option>
+                <option value="">{travelFields.ticketClass.placeholder}</option>
+                <option value="economy">{travelFields.ticketClass.options.economy}</option>
+                <option value="premium">{travelFields.ticketClass.options.premium}</option>
+                <option value="business">{travelFields.ticketClass.options.business}</option>
+                <option value="first">{travelFields.ticketClass.options.first}</option>
               </select>
               {errors.ticketClass && <p className="form-error">{errors.ticketClass}</p>}
             </div>
@@ -348,52 +337,52 @@ const ParticipationForm = () => {
                 className="w-4 h-4 text-suit-600 border-justice-300 rounded focus:ring-suit-500/50"
               />
               <label htmlFor="isDirectlyAffected" className="ml-2 text-justice-700">
-                I was directly affected by unfair practices
+                {incidentText.affectedLabel}
               </label>
             </div>
 
             {formState.isDirectlyAffected && (
               <div className="bg-justice-50 p-6 rounded-lg mt-4 animate-fade-in">
-                <h4 className="font-medium mb-4">Incident Details</h4>
-                
+                <h4 className="font-medium mb-4">{incidentText.title}</h4>
+
                 <div className="mb-4">
-                  <label htmlFor="incidentType" className="form-label">Type of Incident*</label>
-                  <select 
+                  <label htmlFor="incidentType" className="form-label">{incidentText.incidentType.label}</label>
+                  <select
                     id="incidentType"
                     name="incidentType"
                     value={formState.incidentType}
                     onChange={handleChange}
                     className={`form-input ${errors.incidentType ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : ''}`}
                   >
-                    <option value="">Select an incident type</option>
-                    <option value="discrimination">Discrimination against children/families</option>
-                    <option value="misinformation">False information from customer support</option>
-                    <option value="denied-boarding">Unlawful denial of boarding</option>
-                    <option value="overpriced">Overpriced tickets with reduced service</option>
-                    <option value="social-media-fraud">Social media account fraud</option>
-                    <option value="other">Other</option>
+                    <option value="">{incidentText.incidentType.placeholder}</option>
+                    <option value="discrimination">{incidentText.incidentType.options.discrimination}</option>
+                    <option value="misinformation">{incidentText.incidentType.options.misinformation}</option>
+                    <option value="denied-boarding">{incidentText.incidentType.options.deniedBoarding}</option>
+                    <option value="overpriced">{incidentText.incidentType.options.overpriced}</option>
+                    <option value="social-media-fraud">{incidentText.incidentType.options.socialMediaFraud}</option>
+                    <option value="other">{incidentText.incidentType.options.other}</option>
                   </select>
                   {errors.incidentType && <p className="form-error">{errors.incidentType}</p>}
                 </div>
 
                 <div className="mb-4">
-                  <label htmlFor="incidentDescription" className="form-label">Describe What Happened*</label>
-                  <textarea 
+                  <label htmlFor="incidentDescription" className="form-label">{incidentText.descriptionField.label}</label>
+                  <textarea
                     id="incidentDescription"
                     name="incidentDescription"
                     value={formState.incidentDescription}
                     onChange={handleChange}
                     rows={4}
                     className={`form-input ${errors.incidentDescription ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : ''}`}
-                    placeholder="Please provide details about your experience..."
+                    placeholder={incidentText.descriptionField.placeholder}
                   ></textarea>
                   {errors.incidentDescription && <p className="form-error">{errors.incidentDescription}</p>}
                 </div>
 
                 <div className="mb-4">
                   <div className="flex items-center">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       id="hasEvidence"
                       name="hasEvidence"
                       checked={formState.hasEvidence}
@@ -401,13 +390,11 @@ const ParticipationForm = () => {
                       className="w-4 h-4 text-suit-600 border-justice-300 rounded focus:ring-suit-500/50"
                     />
                     <label htmlFor="hasEvidence" className="ml-2 text-justice-700">
-                      I have evidence to support my claim (emails, tickets, etc.)
+                      {incidentText.evidence.label}
                     </label>
                   </div>
                   {formState.hasEvidence && (
-                    <p className="text-sm text-justice-600 mt-2">
-                      Once your registration is complete, you'll receive instructions on how to securely share your evidence.
-                    </p>
+                    <p className="text-sm text-justice-600 mt-2">{incidentText.evidence.helper}</p>
                   )}
                 </div>
               </div>
@@ -415,10 +402,10 @@ const ParticipationForm = () => {
           </div>
 
           <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-4">Contact Preferences</h3>
+            <h3 className="text-xl font-semibold mb-4">{contactText.title}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="form-input-wrapper">
-                <span className="form-label">Preferred contact method</span>
+                <span className="form-label">{contactText.preferredMethod}</span>
                 <div className="flex items-center gap-4 mt-2">
                   <label className="inline-flex items-center gap-2 text-sm text-justice-700">
                     <input
@@ -429,7 +416,7 @@ const ParticipationForm = () => {
                       onChange={handleChange}
                       className="w-4 h-4 text-suit-600 border-justice-300 focus:ring-suit-500/50"
                     />
-                    Email
+                    {contactText.methods.email}
                   </label>
                   <label className="inline-flex items-center gap-2 text-sm text-justice-700">
                     <input
@@ -440,7 +427,7 @@ const ParticipationForm = () => {
                       onChange={handleChange}
                       className="w-4 h-4 text-suit-600 border-justice-300 focus:ring-suit-500/50"
                     />
-                    Phone
+                    {contactText.methods.phone}
                   </label>
                 </div>
               </div>
@@ -453,9 +440,7 @@ const ParticipationForm = () => {
                     onChange={handleChange}
                     className="mt-1 w-4 h-4 text-suit-600 border-justice-300 rounded focus:ring-suit-500/50"
                   />
-                  <span className="text-sm text-justice-700">
-                    I agree to receive occasional strategic updates and calls-to-action by email.
-                  </span>
+                  <span className="text-sm text-justice-700">{contactText.updatesConsent}</span>
                 </label>
               </div>
             </div>
@@ -466,18 +451,16 @@ const ParticipationForm = () => {
               <div className="flex items-start">
                 <AlertCircle size={20} className="text-suit-700 mr-3 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="font-medium mb-2">Important Information</h4>
-                  <p className="text-sm text-justice-700 mb-4">
-                    By participating in this class-action lawsuit:
-                  </p>
+                  <h4 className="font-medium mb-2">{termsText.title}</h4>
+                  <p className="text-sm text-justice-700 mb-4">{termsText.intro}</p>
                   <ul className="text-sm text-justice-700 space-y-2 mb-4">
-                    <li>You authorize our legal team to represent you in this case.</li>
-                    <li>Legal fees will only be collected if compensation is secured (typically 20-30% of your award).</li>
-                    <li>Your personal information will be handled according to our Privacy Policy and used solely for this legal action.</li>
+                    {termsText.bullets.map(bullet => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
                   </ul>
                   <div className="flex items-center">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       id="agreeToTerms"
                       name="agreeToTerms"
                       checked={formState.agreeToTerms}
@@ -486,11 +469,13 @@ const ParticipationForm = () => {
                         errors.agreeToTerms ? 'border-red-300' : ''
                       }`}
                     />
-                    <label htmlFor="agreeToTerms" className={`ml-2 text-justice-700 ${
-                      errors.agreeToTerms ? 'text-red-600' : ''
-                    }`}>
-                      I agree to these terms and the <a href="#" className="underline">Privacy Policy</a>*
-                    </label>
+                    <label
+                      htmlFor="agreeToTerms"
+                      className={`ml-2 text-justice-700 ${
+                        errors.agreeToTerms ? 'text-red-600' : ''
+                      }`}
+                      dangerouslySetInnerHTML={{ __html: termsText.agreementLabel }}
+                    />
                   </div>
                   {errors.agreeToTerms && <p className="form-error mt-1">{errors.agreeToTerms}</p>}
                 </div>
@@ -498,7 +483,7 @@ const ParticipationForm = () => {
             </div>
           </div>
 
-          <button 
+          <button
             type="submit"
             disabled={isSubmitting}
             className={`btn btn-primary w-full flex items-center justify-center ${
@@ -511,10 +496,10 @@ const ParticipationForm = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Processing...
+                {formText.submitButton.loading}
               </>
             ) : (
-              'Join the Class-Action Lawsuit'
+              formText.submitButton.idle
             )}
           </button>
         </form>

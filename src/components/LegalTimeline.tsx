@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Calendar, Scale, Send } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 interface TimelineEvent {
   title: string;
@@ -35,43 +36,9 @@ const LegalTimeline = () => {
     return () => observer.disconnect();
   }, []);
 
-  const events: TimelineEvent[] = [
-    {
-      title: 'Evidence Consolidation',
-      date: 'February – April 2024',
-      description:
-        'Collecting testimonies, pricing data, and correspondence to demonstrate systemic unfair practices.',
-      status: 'completed'
-    },
-    {
-      title: 'Regulatory Complaints Filed',
-      date: 'May 2024',
-      description:
-        'Formal complaints submitted to EU consumer protection bodies and aviation authorities across key hubs.',
-      status: 'completed'
-    },
-    {
-      title: 'Class Certification Motion',
-      date: 'July 2024',
-      description:
-        'Lead counsel will request certification in Swiss courts, unlocking broader discovery rights.',
-      status: 'active'
-    },
-    {
-      title: 'Settlement Negotiations Window',
-      date: 'Autumn 2024',
-      description:
-        'If the airline opts to negotiate, participants will vote on settlement terms before final approval.',
-      status: 'upcoming'
-    },
-    {
-      title: 'Court Hearings',
-      date: 'Early 2025',
-      description:
-        'Should negotiations fail, the case proceeds to hearings with expert testimony on consumer damages.',
-      status: 'upcoming'
-    }
-  ];
+  const { translations } = useI18n();
+  const timeline = translations.legalTimeline;
+  const events: TimelineEvent[] = useMemo(() => timeline.events, [timeline.events]);
 
   const getStatusStyles = (status: TimelineEvent['status']) => {
     switch (status) {
@@ -94,13 +61,10 @@ const LegalTimeline = () => {
         <div className="max-w-4xl mx-auto text-center mb-16">
           <div className="inline-flex items-center bg-suit-100 text-suit-800 px-4 py-1 rounded-full text-sm font-medium">
             <Calendar size={16} className="mr-2" />
-            Legal Roadmap
+            {timeline.badge}
           </div>
-          <h2 className="heading-2">Key Milestones Ahead</h2>
-          <p className="subtitle">
-            Transparency is essential for trust. Track the progress of the lawsuit and understand when major decisions will be
-            made.
-          </p>
+          <h2 className="heading-2">{timeline.title}</h2>
+          <p className="subtitle">{timeline.description}</p>
         </div>
 
         <ol className="relative border-l border-justice-200 max-w-3xl mx-auto">
@@ -132,15 +96,12 @@ const LegalTimeline = () => {
         >
           <div className="flex items-center justify-center mb-4">
             <Scale size={24} className="text-suit-600 mr-2" />
-            <span className="font-semibold text-suit-700">Want regular updates?</span>
+            <span className="font-semibold text-suit-700">{timeline.ctaTitle}</span>
           </div>
-          <p className="text-justice-600 mb-6">
-            Subscribe to the litigation briefings and receive monthly summaries of regulatory filings, negotiation outcomes, and
-            participant actions.
-          </p>
+          <p className="text-justice-600 mb-6">{timeline.ctaDescription}</p>
           <a href="#newsletter" className="btn btn-primary inline-flex items-center justify-center">
             <Send size={18} className="mr-2" />
-            Get the briefing
+            {timeline.ctaButton}
           </a>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { CheckCircle2, Info } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 interface EvidenceItem {
   id: string;
@@ -13,36 +14,9 @@ interface EvidenceItem {
  * ready and immediately understand why it matters for the legal team.
  */
 const EvidenceChecklist = () => {
-  const items = useMemo<EvidenceItem[]>(
-    () => [
-      {
-        id: 'booking',
-        label: 'Booking confirmation or reference',
-        description: 'Proof of purchase shows the exact fare paid and flight itinerary.'
-      },
-      {
-        id: 'screenshots',
-        label: 'Screenshots of price changes',
-        description: 'Visual evidence of price discrimination strengthens the damages argument.'
-      },
-      {
-        id: 'support',
-        label: 'Customer support transcripts',
-        description: 'Logs from chat, email, or phone calls reveal misinformation patterns.'
-      },
-      {
-        id: 'receipts',
-        label: 'Receipts for extra expenses',
-        description: 'Hotel, transport, or meal receipts demonstrate financial losses caused by the airline.'
-      },
-      {
-        id: 'medical',
-        label: 'Medical or accessibility documentation',
-        description: 'If special assistance was denied, supporting documents highlight regulatory breaches.'
-      }
-    ],
-    []
-  );
+  const { translations } = useI18n();
+  const checklist = translations.evidenceChecklist;
+  const items = useMemo<EvidenceItem[]>(() => checklist.items, [checklist.items]);
 
   const [selected, setSelected] = useState<Record<string, boolean>>({});
 
@@ -65,13 +39,10 @@ const EvidenceChecklist = () => {
           <div className="text-center mb-12">
             <div className="inline-flex items-center bg-suit-100 text-suit-800 px-4 py-1 rounded-full text-sm font-medium">
               <Info size={16} className="mr-2" />
-              Evidence Toolkit
+              {checklist.badge}
             </div>
-            <h2 className="heading-2">Prepare Your Documents</h2>
-            <p className="subtitle">
-              Collecting supporting material helps the legal team quantify damages faster. Tick the items you already have;
-              you can return to update this list at any time.
-            </p>
+            <h2 className="heading-2">{checklist.title}</h2>
+            <p className="subtitle">{checklist.description}</p>
           </div>
 
           <div className="bg-justice-50 border border-justice-100 rounded-2xl p-8">
@@ -104,12 +75,11 @@ const EvidenceChecklist = () => {
 
             <div className="mt-8 text-center">
               <p className="text-sm font-medium text-suit-700">
-                {completedCount} of {items.length} suggested documents ready
+                {checklist.progressTemplate
+                  .replace('{{completed}}', completedCount.toString())
+                  .replace('{{total}}', items.length.toString())}
               </p>
-              <p className="text-xs text-justice-500 mt-2">
-                Do not worry if you cannot provide everything today. Submit the form and the legal team will help you request
-                missing records.
-              </p>
+              <p className="text-xs text-justice-500 mt-2">{checklist.helper}</p>
             </div>
           </div>
         </div>

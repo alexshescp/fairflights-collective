@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { BookOpen, ExternalLink } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 interface ResourceCategory {
   id: string;
@@ -19,51 +20,19 @@ interface ResourceItem {
  * want to dive further into the legal context.
  */
 const ResourceLibrary = () => {
+  const { translations } = useI18n();
+  const library = translations.resourceLibrary;
   const categories = useMemo<ResourceCategory[]>(
     () => [
-      { id: 'all', label: 'All Resources' },
-      { id: 'regulation', label: 'Regulation & Rights' },
-      { id: 'press', label: 'Press Coverage' },
-      { id: 'research', label: 'Research & Data' }
+      { id: 'all', label: library.categories.all },
+      { id: 'regulation', label: library.categories.regulation },
+      { id: 'press', label: library.categories.press },
+      { id: 'research', label: library.categories.research }
     ],
-    []
+    [library.categories]
   );
 
-  const resources = useMemo<ResourceItem[]>(
-    () => [
-      {
-        title: 'EU Regulation 261/2004 Summary',
-        description: 'Know the passenger rights framework that anchors the collective claim.',
-        url: 'https://europa.eu/youreurope/citizens/travel/passenger-rights/air/index_en.htm',
-        category: 'regulation'
-      },
-      {
-        title: 'Swiss Competition Commission briefing on airline oligopolies',
-        description: 'Official analysis outlining price-setting concerns that mirror the Swiss Airlines case.',
-        url: 'https://www.weko.admin.ch/',
-        category: 'research'
-      },
-      {
-        title: 'Consumer rights watchdog investigates holiday fare spikes',
-        description: 'Recent investigative piece documenting surcharges targeting families during peak periods.',
-        url: 'https://www.theguardian.com/uk/travel',
-        category: 'press'
-      },
-      {
-        title: 'Template letter to request compensation',
-        description: 'A downloadable structure to claim direct refunds while the class action progresses.',
-        url: 'https://airhelp.com/en/air-passenger-rights/',
-        category: 'regulation'
-      },
-      {
-        title: 'Pricing data visualisation: Swiss routes 2019–2024',
-        description: 'Interactive dashboard evidencing abnormal fare increases on family destinations.',
-        url: 'https://public.tableau.com/',
-        category: 'research'
-      }
-    ],
-    []
-  );
+  const resources = useMemo<ResourceItem[]>(() => library.resources, [library.resources]);
 
   const [activeCategory, setActiveCategory] = useState('all');
 
@@ -81,13 +50,10 @@ const ResourceLibrary = () => {
         <div className="max-w-4xl mx-auto text-center mb-14">
           <div className="inline-flex items-center bg-suit-100 text-suit-800 px-4 py-1 rounded-full text-sm font-medium">
             <BookOpen size={16} className="mr-2" />
-            Knowledge Base
+            {library.badge}
           </div>
-          <h2 className="heading-2">Resource Library</h2>
-          <p className="subtitle">
-            Stay informed with curated guides, regulatory frameworks, and investigative journalism supporting the collective
-            action.
-          </p>
+          <h2 className="heading-2">{library.title}</h2>
+          <p className="subtitle">{library.description}</p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-3 mb-10">
@@ -120,7 +86,7 @@ const ResourceLibrary = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center mt-6 text-suit-600 font-medium hover:text-suit-800"
               >
-                Read more
+                {library.readMore}
                 <ExternalLink size={16} className="ml-2" />
               </a>
             </article>
