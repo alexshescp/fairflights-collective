@@ -1,13 +1,7 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import { 
-  ClipboardCheck, 
-  AlertCircle, 
-  Lock, 
-  Mail, 
-  Cookie,
-  ArrowRight
-} from 'lucide-react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { ClipboardCheck, AlertCircle, Lock, Mail, Cookie, ArrowRight } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 const HowItWorks = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -33,38 +27,18 @@ const HowItWorks = () => {
     };
   }, []);
 
-  const steps = [
-    {
-      icon: ClipboardCheck,
-      title: "Fill Out the Participation Form",
-      description: "Provide basic details about your travel experience with Swiss Airlines.",
-      delay: "delay-100"
-    },
-    {
-      icon: AlertCircle,
-      title: "Indicate If You Were Directly Affected",
-      description: "If applicable, additional fields will appear requesting specific incident details.",
-      delay: "delay-200"
-    },
-    {
-      icon: Lock,
-      title: "Consent to Data Processing",
-      description: "Agree to the use of personal data for legal action purposes only.",
-      delay: "delay-300"
-    },
-    {
-      icon: Mail,
-      title: "Email Verification",
-      description: "Confirm your participation via a verification code sent to your email.",
-      delay: "delay-400"
-    },
-    {
-      icon: Cookie,
-      title: "Cookie Notice",
-      description: "A notification regarding cookie usage will appear before registration is complete.",
-      delay: "delay-500"
-    }
-  ];
+  const { translations } = useI18n();
+  const howItWorks = translations.howItWorks;
+  const steps = useMemo(
+    () =>
+      howItWorks.steps.map((step, index) => ({
+        icon: [ClipboardCheck, AlertCircle, Lock, Mail, Cookie][index],
+        title: step.title,
+        description: step.description,
+        delay: `delay-${(index + 1) * 100}`
+      })),
+    [howItWorks.steps]
+  );
 
   return (
     <section 
@@ -77,18 +51,17 @@ const HowItWorks = () => {
           <div className={`inline-block bg-suit-100 text-suit-800 px-4 py-1 rounded-full text-sm font-medium mb-4 transition-all duration-500 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            Process
+            {howItWorks.badge}
           </div>
           <h2 className={`heading-2 mb-4 transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            How It Works
+            {howItWorks.title}
           </h2>
           <p className={`subtitle transition-all duration-700 delay-200 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            Joining the class-action lawsuit is a straightforward process. Follow these steps to 
-            become part of our collective effort against unfair airline practices.
+            {howItWorks.description}
           </p>
         </div>
 
@@ -119,11 +92,11 @@ const HowItWorks = () => {
           <div className={`mt-16 text-center transition-all duration-700 delay-600 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
-            <a 
-              href="#join-form" 
+            <a
+              href="#join-form"
               className="inline-flex items-center btn btn-primary"
             >
-              Start the Process Now
+              {howItWorks.cta}
               <ArrowRight size={18} className="ml-2" />
             </a>
           </div>

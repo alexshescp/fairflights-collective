@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 interface FAQItemProps {
   question: string;
@@ -46,6 +47,8 @@ const FAQ = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const { translations } = useI18n();
+  const faq = translations.faq;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -67,38 +70,7 @@ const FAQ = () => {
     };
   }, []);
 
-  const faqs = [
-    {
-      question: "Who is eligible to join the class-action lawsuit?",
-      answer: "Anyone who flew with Swiss Airlines within the past two years and experienced any form of discrimination, misinformation, unlawful denial of boarding, or was subject to overpriced tickets while receiving reduced service quality is eligible to join.",
-      delay: "delay-100"
-    },
-    {
-      question: "Is there a fee to join the lawsuit?",
-      answer: "No, there is no upfront fee to join the lawsuit. Legal fees will only be collected if the case is successful, as a percentage of the compensation awarded.",
-      delay: "delay-200"
-    },
-    {
-      question: "How long will the legal process take?",
-      answer: "Class-action lawsuits typically take between 1-3 years to resolve. We will keep all participants informed of significant developments throughout the process.",
-      delay: "delay-300"
-    },
-    {
-      question: "What kind of evidence do I need to provide?",
-      answer: "While any evidence strengthens your claim, it's not mandatory to have documentation. Your booking information, travel dates, and description of the issues faced are sufficient to start. If you have emails, screenshots, or other evidence, you'll be able to upload these later in the process.",
-      delay: "delay-400"
-    },
-    {
-      question: "Can I join if I'm not a resident of Switzerland?",
-      answer: "Yes, the lawsuit is open to all passengers of Swiss Airlines regardless of nationality or residence. International laws governing air travel allow for claims across borders.",
-      delay: "delay-500"
-    },
-    {
-      question: "What happens after I submit my information?",
-      answer: "After submitting your information and verifying your email, you'll receive updates about the lawsuit's progress. Our legal team may contact you for additional information if needed. You'll be notified of any settlements or court decisions.",
-      delay: "delay-600"
-    }
-  ];
+  const faqs = faq.items.map((item, index) => ({ ...item, delay: `delay-${(index + 1) * 100}` }));
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -115,17 +87,17 @@ const FAQ = () => {
           <div className={`inline-block bg-suit-100 text-suit-800 px-4 py-1 rounded-full text-sm font-medium mb-4 transition-all duration-500 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            Questions & Answers
+            {faq.badge}
           </div>
           <h2 className={`heading-2 mb-4 transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            Frequently Asked Questions
+            {faq.title}
           </h2>
           <p className={`subtitle transition-all duration-700 delay-200 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            Find answers to common questions about joining the class-action lawsuit against Swiss Airlines.
+            {faq.description}
           </p>
         </div>
 
@@ -146,14 +118,12 @@ const FAQ = () => {
         <div className={`mt-12 text-center transition-all duration-700 delay-700 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
-          <p className="text-justice-600 mb-4">
-            Don't see your question here? Contact us directly:
-          </p>
-          <a 
-            href="mailto:info@fairflights.org" 
+          <p className="text-justice-600 mb-4">{faq.contactPrompt}</p>
+          <a
+            href={`mailto:${faq.contactEmail}`}
             className="text-suit-600 font-medium hover:text-suit-800 transition-colors"
           >
-            info@fairflights.org
+            {faq.contactEmail}
           </a>
         </div>
       </div>
