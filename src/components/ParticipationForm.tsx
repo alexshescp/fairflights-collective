@@ -10,11 +10,15 @@ interface FormState {
   phone: string;
   travelDate: string;
   bookingReference: string;
+  flightNumber: string;
+  ticketClass: string;
   isDirectlyAffected: boolean;
   incidentType: string;
   incidentDescription: string;
   hasEvidence: boolean;
   agreeToTerms: boolean;
+  preferredContact: 'email' | 'phone';
+  consentUpdates: boolean;
 }
 
 const ParticipationForm = () => {
@@ -31,11 +35,15 @@ const ParticipationForm = () => {
     phone: '',
     travelDate: '',
     bookingReference: '',
+    flightNumber: '',
+    ticketClass: '',
     isDirectlyAffected: false,
     incidentType: '',
     incidentDescription: '',
     hasEvidence: false,
     agreeToTerms: false,
+    preferredContact: 'email',
+    consentUpdates: false,
   });
 
   const [errors, setErrors] = useState<Partial<FormState>>({});
@@ -60,6 +68,7 @@ const ParticipationForm = () => {
     };
   }, []);
 
+  // Generic form change handler keeps state updates concise across input types.
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
@@ -90,6 +99,8 @@ const ParticipationForm = () => {
     
     if (!formState.travelDate) newErrors.travelDate = 'Travel date is required';
     if (!formState.bookingReference.trim()) newErrors.bookingReference = 'Booking reference is required';
+    if (!formState.flightNumber.trim()) newErrors.flightNumber = 'Flight number is required';
+    if (!formState.ticketClass) newErrors.ticketClass = 'Select the ticket class you travelled with';
     
     if (formState.isDirectlyAffected) {
       if (!formState.incidentType) newErrors.incidentType = 'Please select an incident type';
@@ -267,8 +278,8 @@ const ParticipationForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="form-input-wrapper">
               <label htmlFor="travelDate" className="form-label">Travel Date*</label>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 id="travelDate"
                 name="travelDate"
                 value={formState.travelDate}
@@ -293,10 +304,43 @@ const ParticipationForm = () => {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="form-input-wrapper">
+              <label htmlFor="flightNumber" className="form-label">Flight Number*</label>
+              <input
+                type="text"
+                id="flightNumber"
+                name="flightNumber"
+                value={formState.flightNumber}
+                onChange={handleChange}
+                className={`form-input ${errors.flightNumber ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : ''}`}
+                placeholder="e.g. LX280"
+              />
+              {errors.flightNumber && <p className="form-error">{errors.flightNumber}</p>}
+            </div>
+            <div className="form-input-wrapper">
+              <label htmlFor="ticketClass" className="form-label">Ticket Class*</label>
+              <select
+                id="ticketClass"
+                name="ticketClass"
+                value={formState.ticketClass}
+                onChange={handleChange}
+                className={`form-input ${errors.ticketClass ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : ''}`}
+              >
+                <option value="">Select an option</option>
+                <option value="economy">Economy</option>
+                <option value="premium">Premium Economy</option>
+                <option value="business">Business</option>
+                <option value="first">First</option>
+              </select>
+              {errors.ticketClass && <p className="form-error">{errors.ticketClass}</p>}
+            </div>
+          </div>
+
           <div className="mb-8">
             <div className="flex items-center mb-4">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 id="isDirectlyAffected"
                 name="isDirectlyAffected"
                 checked={formState.isDirectlyAffected}
@@ -368,6 +412,53 @@ const ParticipationForm = () => {
                 </div>
               </div>
             )}
+          </div>
+
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-4">Contact Preferences</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="form-input-wrapper">
+                <span className="form-label">Preferred contact method</span>
+                <div className="flex items-center gap-4 mt-2">
+                  <label className="inline-flex items-center gap-2 text-sm text-justice-700">
+                    <input
+                      type="radio"
+                      name="preferredContact"
+                      value="email"
+                      checked={formState.preferredContact === 'email'}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-suit-600 border-justice-300 focus:ring-suit-500/50"
+                    />
+                    Email
+                  </label>
+                  <label className="inline-flex items-center gap-2 text-sm text-justice-700">
+                    <input
+                      type="radio"
+                      name="preferredContact"
+                      value="phone"
+                      checked={formState.preferredContact === 'phone'}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-suit-600 border-justice-300 focus:ring-suit-500/50"
+                    />
+                    Phone
+                  </label>
+                </div>
+              </div>
+              <div className="form-input-wrapper">
+                <label className="inline-flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    name="consentUpdates"
+                    checked={formState.consentUpdates}
+                    onChange={handleChange}
+                    className="mt-1 w-4 h-4 text-suit-600 border-justice-300 rounded focus:ring-suit-500/50"
+                  />
+                  <span className="text-sm text-justice-700">
+                    I agree to receive occasional strategic updates and calls-to-action by email.
+                  </span>
+                </label>
+              </div>
+            </div>
           </div>
 
           <div className="mb-8">
